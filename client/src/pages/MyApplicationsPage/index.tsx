@@ -1,14 +1,12 @@
 import { Container } from './style.ts'
 import {
-  Box,
   IconButton,
   List,
   ListItem,
   ListItemText,
-  Pagination,
   Typography,
 } from '@mui/material'
-import { ChangeEvent, useEffect, useState, MouseEvent } from 'react'
+import { useEffect, useState, MouseEvent } from 'react'
 import {
   useGetAllQuery,
   useGetByUserQuery,
