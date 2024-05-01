@@ -1,4 +1,3 @@
-import { Container } from './style.ts'
 import {
   IconButton,
   List,
@@ -46,6 +45,11 @@ export const MyApplicationsPage = () => {
     return data.application.slice(startIndex, endIndex)
   }
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text
+    return text.slice(0, maxLength) + '...'
+  }
+
   const handleUpdateStatus = (
     carNumber: string,
     isAccepted: boolean,
@@ -59,6 +63,7 @@ export const MyApplicationsPage = () => {
   const navigate = useNavigate()
 
   console.log(data)
+  console.log(!data?.application.length)
 
   useEffect(() => {
     if (user.role === 'USER' && userDataRefetch) {
@@ -69,14 +74,16 @@ export const MyApplicationsPage = () => {
   }, [user.role, userDataRefetch, allDataRefetch])
 
   return (
-    <Container>
+    <>
       <Typography sx={{ fontSize: '20px', fontWeight: '450' }}>
         Мои заявления
       </Typography>
       <div>
-        {!data && <Typography>Актуальные заявления отсутствуют</Typography>}
-        <List>
-          {data && (
+        {!data?.application.length && (
+          <Typography>Актуальные заявления отсутствуют</Typography>
+        )}
+        {data && data?.application.length > 0 && (
+          <List sx={{ height: '73vh' }}>
             <>
               {getDataSlice().map((application) => (
                 <ListItem
@@ -102,7 +109,8 @@ export const MyApplicationsPage = () => {
                     <strong>Номер автомобиля:</strong> {application.carNumber}
                   </ListItemText>
                   <ListItemText>
-                    <strong>Описание:</strong> {application.description}
+                    <strong>Описание:</strong>{' '}
+                    {truncateText(application.description, 150)}
                   </ListItemText>
                   <ListItemText>
                     <strong>Статус:</strong> {application.status}
@@ -131,9 +139,9 @@ export const MyApplicationsPage = () => {
                 </ListItem>
               ))}
             </>
-          )}
-        </List>
-        {data && data.application.length && (
+          </List>
+        )}
+        {data && data.application.length > 0 && (
           <DataPagination
             pageCount={Math.ceil(data.application.length / itemsPerPage)}
             currentPage={page}
@@ -141,6 +149,6 @@ export const MyApplicationsPage = () => {
           />
         )}
       </div>
-    </Container>
+    </>
   )
 }
