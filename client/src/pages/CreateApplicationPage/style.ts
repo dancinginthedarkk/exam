@@ -9,12 +9,16 @@ export const PageContainer = styled.div`
 `
 
 export const Container = styled.div`
-  align-items: center;
-  width: 35%;
-  border: 1px solid gray;
-  border-radius: 15px;
+  width: 50%;
+  //border: 1px solid gray;
+  //border-radius: 15px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
   padding: 30px;
+
+  @media screen and (max-width: 1000px) {
+    width: 80%;
+    padding: 20px;
+  }
 `

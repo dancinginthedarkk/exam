@@ -5,26 +5,43 @@ import { useCreateApplicationMutation } from '../../__redux__/services/applicati
 import { useSelector } from 'react-redux'
 import { SnackbarSimple } from '../../components/Snackbar'
 import { PageContainer, Container } from './style.ts'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { CreateApplicationFormValues } from './types/CreateApplicationFormValues.ts'
+import { createApplicationDefaultValues } from './schema/createApplicationDefaultValues.ts'
+import { createApplicationValidationSchema } from './schema/createApplicationValidationSchema.ts'
+import { userSelector } from '../../__redux__/selectors/userSelectors.ts'
 
 export const CreateApplicationPage = () => {
-  const [carRegistration, setCarRegistration] = useState('')
-  const [violationDescription, setViolationDescription] = useState('')
   const [snackbarOpen, setSnackbarOpen] = useState(false)
 
   const [createApplication, { isLoading, error }] =
     useCreateApplicationMutation()
-  const user = useSelector((state) => state.userSlice)
+  const user = useSelector(userSelector)
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault()
+  const form = useForm<CreateApplicationFormValues>({
+    defaultValues: createApplicationDefaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(createApplicationValidationSchema),
+  })
 
+  const {
+    register,
+    clearErrors,
+    formState: { errors, isValid },
+    handleSubmit,
+    reset,
+  } = form
+
+  const onSubmit = (data: CreateApplicationFormValues) => {
+    const { car, description } = data
     createApplication({
-      carNumber: carRegistration,
-      description: violationDescription,
+      carNumber: car,
+      description: description,
       userId: user.id,
     }).then(() => {
-      setCarRegistration('')
-      setViolationDescription('')
+      reset()
+      clearErrors()
       setSnackbarOpen(true)
     })
   }
@@ -38,34 +55,36 @@ export const CreateApplicationPage = () => {
         <Box
           component="form"
           sx={{ mt: 1 }}
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           noValidate
           autoComplete="off"
         >
           <TextField
+            {...register('car')}
             fullWidth
             label="Гос. регистрационный номер"
             variant="outlined"
-            value={carRegistration}
-            onChange={(e) => setCarRegistration(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 1 }}
             required
+            error={!!errors.car}
+            helperText={errors.car?.message || ' '}
           />
           <TextField
+            {...register('description')}
             fullWidth
             label="Описание нарушения"
             variant="outlined"
-            value={violationDescription}
-            onChange={(e) => setViolationDescription(e.target.value)}
             multiline
             rows={4}
             required
-            sx={{ mb: 2 }}
+            sx={{ mb: 1 }}
             inputProps={{ maxLength: 250 }}
+            error={!!errors.description}
+            helperText={errors.description?.message || ' '}
           />
           <LoadingButton
             loading={isLoading}
-            disabled={!(carRegistration && violationDescription)}
+            disabled={!isValid}
             type="submit"
             variant="contained"
             color="primary"

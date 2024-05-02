@@ -3,7 +3,7 @@ export interface TabData {
   value: string
   name: string
   icon?: string
-  link?: string
+  link: string
 }
 
 export const headerTabsDataCreation = () => {

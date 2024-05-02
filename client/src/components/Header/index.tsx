@@ -1,11 +1,17 @@
-import { HeaderContainer, LogoTypography } from './header.ts'
-import { Button, IconButton, Tab, Tabs } from '@mui/material'
+import {
+  HeaderContainer,
+  HeaderTabs,
+  IconButtonLogout,
+  LogoTypography,
+} from './header.ts'
+import { Button, Tab } from '@mui/material'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { headerTabsDataCreation } from './helpers/headerTabsDataCreation.ts'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { clearAuth } from '../../__redux__/slice/userSlice.ts'
+import { BurgerHeader } from './BurgerHeader'
 
 export const Header = () => {
   const [navTabValue, setNavTabValue] = useState('myApplications')
@@ -34,11 +40,13 @@ export const Header = () => {
   return (
     <HeaderContainer>
       <LogoTypography>Название продукта |</LogoTypography>
-      <Tabs
+      <HeaderTabs
         value={navTabValue}
         onChange={tabChangeHandler}
         color="primary"
-        sx={{ '& .MuiTabs-indicator': { display: 'none' }, flex: 1 }}
+        sx={{
+          '& .MuiTabs-indicator': { display: 'none' },
+        }}
       >
         {tabs.map((tab) => (
           <Tab
@@ -54,10 +62,11 @@ export const Header = () => {
             }}
           />
         ))}
-      </Tabs>
-      <IconButton onClick={handleExit}>
+      </HeaderTabs>
+      <IconButtonLogout onClick={handleExit}>
         <LogoutIcon color="primary" />
-      </IconButton>
+      </IconButtonLogout>
+      <BurgerHeader />
     </HeaderContainer>
   )
 }

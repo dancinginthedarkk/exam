@@ -1,10 +1,4 @@
-import {
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from '@mui/material'
+import { IconButton, List, ListItemText, Typography } from '@mui/material'
 import { useEffect, useState, MouseEvent } from 'react'
 import {
   useGetAllQuery,
@@ -17,13 +11,12 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { useNavigate } from 'react-router-dom'
 import { DataPagination } from '../../components/DataPagination'
 import { userSelector } from '../../__redux__/selectors/userSelectors.ts'
+import { ListItemData, ListItemStatus } from './style.ts'
 
 export const MyApplicationsPage = () => {
   const itemsPerPage = 5
   const [page, setPage] = useState(1)
   const user = useSelector(userSelector)
-
-  console.log(user.role)
 
   const { data: userData, refetch: userDataRefetch } = useGetByUserQuery(
     user.id
@@ -31,7 +24,6 @@ export const MyApplicationsPage = () => {
   const { data: allData, refetch: allDataRefetch } = useGetAllQuery({})
 
   const data = user.role === 'USER' ? userData : allData
-  // const isLoading = user.role === 'USER' ? isUserDataLoading : isAllDataLoading
 
   const [updateStatusApplication] = useUpdateStatusApplicationMutation()
 
@@ -51,19 +43,16 @@ export const MyApplicationsPage = () => {
   }
 
   const handleUpdateStatus = (
-    carNumber: string,
+    id: string,
     isAccepted: boolean,
     event: MouseEvent<HTMLButtonElement>
   ) => {
     event.stopPropagation()
-    updateStatusApplication({ carNumber, isAccepted })
+    updateStatusApplication({ id, isAccepted })
     allDataRefetch()
   }
 
   const navigate = useNavigate()
-
-  console.log(data)
-  console.log(!data?.application.length)
 
   useEffect(() => {
     if (user.role === 'USER' && userDataRefetch) {
@@ -83,28 +72,13 @@ export const MyApplicationsPage = () => {
           <Typography>Актуальные заявления отсутствуют</Typography>
         )}
         {data && data?.application.length > 0 && (
-          <List sx={{ height: '73vh' }}>
-            <>
-              {getDataSlice().map((application) => (
-                <ListItem
-                  key={application.id}
-                  onClick={() => navigate(`/application/${application.id}`)}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'start',
-                    backgroundColor:
-                      application.status === 'Принят'
-                        ? '#8bc34a5c'
-                        : application.status === 'Отклонен'
-                          ? '#ff572273'
-                          : '#E0E0E0',
-                    borderRadius: '5px',
-                    padding: '10px',
-                    marginBottom: '10px',
-                    cursor: 'pointer',
-                  }}
-                >
+          <List sx={{ height: '100%', minHeight: '680px', p: 0 }}>
+            {getDataSlice().map((application: any) => (
+              <ListItemData
+                key={application.id}
+                onClick={() => navigate(`/application/${application.id}`)}
+              >
+                <div style={{ flex: '1' }}>
                   <ListItemText>
                     <strong>Номер автомобиля:</strong> {application.carNumber}
                   </ListItemText>
@@ -112,33 +86,33 @@ export const MyApplicationsPage = () => {
                     <strong>Описание:</strong>{' '}
                     {truncateText(application.description, 150)}
                   </ListItemText>
-                  <ListItemText>
-                    <strong>Статус:</strong> {application.status}
-                  </ListItemText>
-                  {application.status === 'В ожидании' &&
-                    user.role !== 'USER' && (
-                      <>
-                        <IconButton
-                          onClick={(e) =>
-                            handleUpdateStatus(application.carNumber, true, e)
-                          }
-                          size="small"
-                        >
-                          <DoneIcon fontSize="small" color="success" />
-                        </IconButton>
-                        <IconButton
-                          onClick={(e) =>
-                            handleUpdateStatus(application.carNumber, false, e)
-                          }
-                          size="small"
-                        >
-                          <ClearIcon fontSize="small" color="error" />
-                        </IconButton>
-                      </>
-                    )}
-                </ListItem>
-              ))}
-            </>
+                  <ListItemStatus status={application.status}>
+                    {application.status}
+                  </ListItemStatus>
+                </div>
+                {application.status === 'В ожидании' &&
+                  user.role !== 'USER' && (
+                    <div>
+                      <IconButton
+                        onClick={(e) =>
+                          handleUpdateStatus(application.carNumber, true, e)
+                        }
+                        size="medium"
+                      >
+                        <DoneIcon fontSize="medium" color="success" />
+                      </IconButton>
+                      <IconButton
+                        onClick={(e) =>
+                          handleUpdateStatus(application.carNumber, false, e)
+                        }
+                        size="medium"
+                      >
+                        <ClearIcon fontSize="medium" color="error" />
+                      </IconButton>
+                    </div>
+                  )}
+              </ListItemData>
+            ))}
           </List>
         )}
         {data && data.application.length > 0 && (
