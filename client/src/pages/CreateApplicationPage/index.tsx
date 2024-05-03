@@ -12,7 +12,7 @@ import { createApplicationDefaultValues } from './schema/createApplicationDefaul
 import { createApplicationValidationSchema } from './schema/createApplicationValidationSchema.ts'
 import { userSelector } from '../../__redux__/selectors/userSelectors.ts'
 
-export const CreateApplicationPage = () => {
+export const CreateApplicationPage = ({ onClose }: { onClose: () => void }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
 
   const [createApplication, { isLoading, error }] =
@@ -44,6 +44,7 @@ export const CreateApplicationPage = () => {
       clearErrors()
       setSnackbarOpen(true)
     })
+    onClose()
   }
 
   return (

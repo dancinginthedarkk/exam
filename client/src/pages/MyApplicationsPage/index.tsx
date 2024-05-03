@@ -1,4 +1,10 @@
-import { IconButton, List, ListItemText, Typography } from '@mui/material'
+import {
+  Button,
+  IconButton,
+  List,
+  ListItemText,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState, MouseEvent } from 'react'
 import {
   useGetAllQuery,
@@ -12,10 +18,13 @@ import { useNavigate } from 'react-router-dom'
 import { DataPagination } from '../../components/DataPagination'
 import { userSelector } from '../../__redux__/selectors/userSelectors.ts'
 import { ListItemData, ListItemStatus } from './style.ts'
+import { ModalWindow } from '../../components/ModalWindow'
+import { CreateApplicationPage } from '../CreateApplicationPage'
 
 export const MyApplicationsPage = () => {
   const itemsPerPage = 5
   const [page, setPage] = useState(1)
+  const [modalIsOpen, setModalIsOpen] = useState(false)
   const user = useSelector(userSelector)
 
   const { data: userData, refetch: userDataRefetch } = useGetByUserQuery(
@@ -68,6 +77,7 @@ export const MyApplicationsPage = () => {
         Мои заявления
       </Typography>
       <div>
+        <Button onClick={() => setModalIsOpen(true)}>Создать заявку</Button>
         {!data?.application.length && (
           <Typography>Актуальные заявления отсутствуют</Typography>
         )}
@@ -122,6 +132,13 @@ export const MyApplicationsPage = () => {
             onPageChange={handleChange}
           />
         )}
+        <ModalWindow
+          isOpen={modalIsOpen}
+          onClose={() => setModalIsOpen(false)}
+          title="Создание заявки"
+        >
+          <CreateApplicationPage onClose={() => setModalIsOpen(false)} />
+        </ModalWindow>
       </div>
     </>
   )
